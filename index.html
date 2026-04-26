@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domara — Tech Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple:        #4B0082;
+    --purple-deep:   #2d004f;
+    --purple-mid:    #6a0dad;
+    --purple-light:  #9b30d0;
+    --purple-pale:   #f3eaff;
+    --purple-pale2:  #ede0ff;
+    --white:         #ffffff;
+    --text:          #1a0030;
+    --text-muted:    #6b5080;
+    --border:        #e2d4f0;
+    --card-shadow:   0 4px 24px rgba(75,0,130,0.10);
+    --card-hover:    0 12px 40px rgba(75,0,130,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ══════════════════════════
+     LOGO SVG (inline reusable)
+  ══════════════════════════ */
+  .logo-svg { height: 36px; width: auto; display: block; }
+  .logo-svg-sm { height: 28px; }
+  .logo-svg-lg { height: 52px; }
+
+  /* ══════════════════════════
+     NAV — scrolls between dark (over hero) and white
+  ══════════════════════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 70px;
+    transition: background .35s, box-shadow .35s, border-color .35s;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 20px rgba(75,0,130,0.07);
+  }
+  nav.scrolled .nav-links a { color: var(--text-muted); }
+  nav.scrolled .nav-links a:hover { color: var(--purple); }
+  nav.scrolled .hamburger span { background: var(--text); }
+
+  .nav-links { display: flex; gap: 30px; list-style: none; align-items: center; }
+  .nav-links a {
+    color: rgba(255,255,255,0.85); text-decoration: none;
+    font-size: 0.9rem; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--white) !important;
+    color: var(--purple) !important;
+    padding: 9px 22px; border-radius: 7px;
+    font-family: 'Orbitron', monospace; font-size: 0.72rem;
+    font-weight: 700; letter-spacing: 2px;
+  }
+  nav.scrolled .nav-cta {
+    background: var(--purple) !important;
+    color: var(--white) !important;
+  }
+  .nav-cta:hover { opacity: .88; }
+
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; background: none; border: none; padding: 4px;
+  }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: background .3s; }
+
+  .mobile-menu {
+    display: none; position: fixed;
+    top: 70px; left: 0; right: 0;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 5%; flex-direction: column; gap: 18px; z-index: 999;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    color: var(--text-muted); text-decoration: none;
+    font-size: 1.05rem; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; transition: color .2s;
+  }
+  .mobile-menu a:hover { color: var(--purple); }
+  .mobile-menu .m-cta {
+    background: var(--purple); color: var(--white) !important;
+    padding: 12px 24px; border-radius: 7px; text-align: center;
+    font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+  }
+
+  /* ══════════════════════════
+     HERO — keeps dark theme
+  ══════════════════════════ */
+  .hero {
+    position: relative; min-height: 100svh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; overflow: hidden; padding: 100px 5% 80px;
+    background: #0b0015;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(75,0,130,0.22) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(75,0,130,0.22) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 18s linear infinite;
+  }
+  @keyframes gridMove { 0%{background-position:0 0} 100%{background-position:50px 50px} }
+
+  .hero-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(106,13,173,0.65) 0%, rgba(75,0,130,0.25) 50%, transparent 80%);
+  }
+  .orb { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.38; animation: floatOrb 12s ease-in-out infinite; }
+  .orb-1 { width: 420px; height: 420px; background: var(--purple); top: -10%; left: -8%; }
+  .orb-2 { width: 300px; height: 300px; background: var(--purple-light); bottom: 0; right: -5%; animation-delay: -6s; }
+  .orb-3 { width: 180px; height: 180px; background: #1a0030; top: 45%; left: 32%; animation-delay: -3s; }
+  @keyframes floatOrb { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-40px) scale(1.08)} }
+
+  .hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 2; max-width: 780px; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(75,0,130,0.4);
+    border: 1px solid rgba(155,48,208,0.4);
+    border-radius: 100px; padding: 6px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: #c9b8e8;
+    letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 28px; animation: fadeUp .8s ease both;
+  }
+  .hero-badge .dot { width: 7px; height: 7px; background: #9b30d0; border-radius: 50%; animation: pulse 2s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.4rem, 8vw, 5.5rem);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -1px; color: #fff;
+    animation: fadeUp .8s .15s ease both; margin-bottom: 8px;
+  }
+  .hero-title .outline { color: transparent; -webkit-text-stroke: 2px var(--purple-light); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 400; color: #c9b8e8;
+    max-width: 560px; margin: 20px auto 40px; line-height: 1.65;
+    animation: fadeUp .8s .3s ease both;
+  }
+
+  .hero-actions {
+    display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;
+    animation: fadeUp .8s .45s ease both;
+  }
+
+  .btn-hero-primary {
+    background: var(--white); color: var(--purple);
+    padding: 14px 36px; border-radius: 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.78rem;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 0 30px rgba(255,255,255,0.2);
+  }
+  .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,255,255,0.25); }
+
+  .btn-hero-outline {
+    background: transparent; color: #fff;
+    padding: 14px 36px; border-radius: 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.78rem;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; border: 1.5px solid rgba(255,255,255,0.3);
+    cursor: pointer; transition: all .25s;
+  }
+  .btn-hero-outline:hover { border-color: var(--purple-light); color: var(--purple-light); transform: translateY(-2px); }
+
+  .scroll-hint {
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: fadeUp 1s 1s ease both; z-index: 2;
+  }
+  .scroll-hint span { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: #c9b8e8; letter-spacing: 2px; }
+  .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--purple-light), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100%{opacity:0;transform:scaleY(0);transform-origin:top} 50%{opacity:1;transform:scaleY(1)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ══════════════════════════
+     STATS — white bg
+  ══════════════════════════ */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-item {
+    background: var(--white); padding: 40px 24px; text-align: center;
+    border-right: 1px solid var(--border);
+    transition: background .2s;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:hover { background: var(--purple-pale); }
+  .stat-num { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight: 900; color: var(--purple); display: block; }
+  .stat-num .hi { color: var(--purple-light); }
+  .stat-label { font-size: 0.82rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 6px; display: block; font-weight: 600; }
+
+  /* ══════════════════════════
+     SHARED — white sections
+  ══════════════════════════ */
+  .section-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+    color: var(--purple-mid); letter-spacing: 3px; text-transform: uppercase;
+    margin-bottom: 12px; font-weight: 500;
+  }
+  .section-tag::before { content: '// '; opacity: .45; }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 14px;
+  }
+  .section-desc { color: var(--text-muted); font-size: 1.05rem; line-height: 1.7; max-width: 560px; }
+
+  /* ══════════════════════════
+     COURSES
+  ══════════════════════════ */
+  .courses { padding: 100px 5%; background: var(--white); }
+  .courses-header { text-align: center; margin-bottom: 60px; }
+  .courses-header .section-desc { margin: 0 auto; }
+
+  .courses-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 24px; max-width: 1200px; margin: 0 auto;
+  }
+
+  .course-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px;
+    position: relative; overflow: hidden;
+    transition: all .3s; cursor: pointer; color: inherit;
+  }
+  .course-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--purple), var(--purple-light));
+    transform: scaleX(0); transform-origin: left; transition: transform .35s;
+  }
+  .course-card:hover { transform: translateY(-6px); border-color: rgba(106,13,173,0.25); box-shadow: var(--card-hover); }
+  .course-card:hover::before { transform: scaleX(1); }
+
+  .course-icon {
+    width: 52px; height: 52px;
+    background: var(--purple-pale); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; margin-bottom: 20px;
+    border: 1px solid var(--purple-pale2);
+  }
+  .course-level { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--purple-mid); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .course-name { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 12px; line-height: 1.3; }
+  .course-desc { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 24px; }
+  .course-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+  .course-meta span { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+  .course-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--purple); color: var(--white);
+    padding: 10px 22px; border-radius: 7px;
+    font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;
+    border: none; cursor: pointer; transition: background .2s;
+  }
+  .course-btn:hover { background: var(--purple-mid); }
+
+  .badge-new {
+    position: absolute; top: 20px; right: 20px;
+    background: var(--purple); color: var(--white);
+    font-size: 0.62rem; font-family: 'Orbitron', monospace;
+    letter-spacing: 1px; padding: 4px 10px; border-radius: 100px; text-transform: uppercase;
+  }
+
+  /* ══════════════════════════
+     WHY DOMARA
+  ══════════════════════════ */
+  .why-section { background: var(--purple-pale); padding: 100px 5%; }
+  .why-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+  }
+  @media(max-width:768px){ .why-wrap{grid-template-columns:1fr;gap:48px;} }
+
+  .why-visual-box {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; position: relative;
+    aspect-ratio: 1; display: flex; align-items: center;
+    box-shadow: var(--card-shadow);
+  }
+  .why-visual-box::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(75,0,130,0.08), transparent 60%);
+  }
+  .code-block {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 2;
+    color: var(--text-muted); padding: 32px; position: relative; z-index: 1; text-align: left; width: 100%;
+  }
+  .kw { color: var(--purple); font-weight: 600; }
+  .fn { color: var(--purple-mid); }
+  .str { color: #2e7d32; }
+  .cm { color: #aaa; font-style: italic; }
+  .cursor { display: inline-block; width: 2px; height: 14px; background: var(--purple); vertical-align: middle; animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .corner-tag {
+    position: absolute; bottom: -1px; right: -1px;
+    background: var(--purple); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; color: rgba(255,255,255,0.8);
+    padding: 7px 14px; border-radius: 20px 0 20px 0; letter-spacing: 1px;
+  }
+
+  .feature-list { display: flex; flex-direction: column; gap: 22px; margin-top: 36px; }
+  .feature-item { display: flex; gap: 16px; align-items: flex-start; }
+  .feature-icon {
+    width: 44px; height: 44px; min-width: 44px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    box-shadow: var(--card-shadow);
+  }
+  .feature-text h4 { font-family: 'Orbitron', monospace; font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .feature-text p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ══════════════════════════
+     BLOG
+  ══════════════════════════ */
+  .blog-section { padding: 100px 5%; background: var(--white); }
+  .blog-header { text-align: center; margin-bottom: 60px; }
+  .blog-header .section-desc { margin: 0 auto; }
+
+  .blog-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px; max-width: 1200px; margin: 0 auto 48px;
+  }
+
+  .blog-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    transition: all .3s; cursor: pointer;
+  }
+  .blog-card:hover { transform: translateY(-5px); box-shadow: var(--card-hover); border-color: rgba(106,13,173,0.2); }
+
+  .blog-thumb {
+    width: 100%; height: 180px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; position: relative; overflow: hidden;
+  }
+  .blog-thumb-1 { background: linear-gradient(135deg, #2d004f, #6a0dad); }
+  .blog-thumb-2 { background: linear-gradient(135deg, #0d2b6b, #1a6dad); }
+  .blog-thumb-3 { background: linear-gradient(135deg, #0d4f2d, #1dad6a); }
+  .blog-thumb-4 { background: linear-gradient(135deg, #4f2d0d, #ad6a1a); }
+  .blog-thumb-5 { background: linear-gradient(135deg, #4f0d2d, #ad1a6a); }
+  .blog-thumb-6 { background: linear-gradient(135deg, #2d2d0d, #adad1a); }
+
+  .blog-thumb-label {
+    position: absolute; top: 14px; left: 14px;
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
+    color: rgba(255,255,255,0.9); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .blog-body { padding: 24px; }
+  .blog-meta { display: flex; gap: 16px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+  .blog-cat {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    color: var(--purple-mid); letter-spacing: 2px; text-transform: uppercase; font-weight: 500;
+  }
+  .blog-date { font-size: 0.78rem; color: var(--text-muted); }
+  .blog-title { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: 700; color: var(--text); line-height: 1.35; margin-bottom: 10px; }
+  .blog-excerpt { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+  .blog-read {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--purple); font-weight: 700; font-size: 0.88rem;
+    text-decoration: none; letter-spacing: .5px; transition: gap .2s;
+    background: none; border: none; cursor: pointer; font-family: 'Rajdhani', sans-serif;
+  }
+  .blog-read:hover { gap: 10px; }
+  .blog-author { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .blog-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; color: #fff;
+  }
+  .blog-author-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .blog-read-time { font-size: 0.75rem; color: var(--text-muted); }
+
+  .blog-cta-wrap { text-align: center; }
+  .btn-outline-purple {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--purple);
+    padding: 13px 32px; border-radius: 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.76rem;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    border: 2px solid var(--purple); cursor: pointer; transition: all .25s; text-decoration: none;
+  }
+  .btn-outline-purple:hover { background: var(--purple); color: var(--white); }
+
+  /* ══════════════════════════
+     TESTIMONIALS
+  ══════════════════════════ */
+  .testimonials { padding: 100px 5%; background: var(--purple-pale); }
+  .testimonials-header { text-align: center; margin-bottom: 60px; }
+  .testimonials-header .section-desc { margin: 0 auto; }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; }
+  .testi-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 32px; transition: all .3s; box-shadow: var(--card-shadow); }
+  .testi-card:hover { transform: translateY(-4px); box-shadow: var(--card-hover); }
+  .testi-stars { color: var(--purple-light); font-size: 1rem; margin-bottom: 16px; letter-spacing: 2px; }
+  .testi-text { color: var(--text); font-size: 0.97rem; line-height: 1.65; margin-bottom: 24px; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.78rem; color: #fff;
+  }
+  .tname { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+  .trole { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* ══════════════════════════
+     CTA
+  ══════════════════════════ */
+  .cta-wrap { padding: 0 5% 80px; background: var(--white); }
+  .cta-banner {
+    background: linear-gradient(135deg, var(--purple-deep), var(--purple));
+    border-radius: 24px; padding: 70px 48px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-banner::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .cta-banner h2 { font-family: 'Orbitron', monospace; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; color: #fff; margin-bottom: 16px; position: relative; }
+  .cta-banner p { color: rgba(255,255,255,0.75); font-size: 1.05rem; margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto; position: relative; }
+  .btn-white {
+    background: var(--white); color: var(--purple);
+    padding: 14px 38px; border-radius: 8px;
+    font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
+    display: inline-block; transition: all .25s; position: relative;
+  }
+  .btn-white:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.2); }
+
+  /* ══════════════════════════
+     FOOTER
+  ══════════════════════════ */
+  footer { background: var(--text); padding: 60px 5% 32px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 56px; }
+  .footer-brand p { color: rgba(255,255,255,0.5); font-size: 0.9rem; line-height: 1.7; max-width: 280px; margin-top: 16px; }
+  .footer-socials { display: flex; gap: 10px; margin-top: 20px; }
+  .social-btn {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.82rem; font-weight: 700; transition: all .2s;
+  }
+  .social-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .footer-col h5 { font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 20px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
+  .footer-col ul a:hover { color: #fff; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom p { font-size: 0.82rem; color: rgba(255,255,255,0.35); }
+
+  /* ══════════════════════════
+     MODAL
+  ══════════════════════════ */
+  .modal-overlay { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 44px; max-width: 500px; width: 100%; position: relative; animation: modalIn .3s ease; box-shadow: 0 30px 80px rgba(75,0,130,0.2); }
+  @keyframes modalIn { from{opacity:0;transform:scale(.94) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .modal-close { position: absolute; top: 18px; right: 18px; background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; transition: color .2s; }
+  .modal-close:hover { color: var(--text); }
+  .modal h3 { font-family: 'Orbitron', monospace; font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .modal-course-name { color: var(--purple-mid); font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; margin-bottom: 28px; letter-spacing: 1px; display: block; }
+  .modal label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 7px; letter-spacing: 1px; font-weight: 600; }
+  .modal input { width: 100%; background: var(--purple-pale); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 12px 16px; font-size: 0.95rem; font-family: 'Rajdhani', sans-serif; outline: none; transition: border-color .2s; margin-bottom: 20px; }
+  .modal input:focus { border-color: var(--purple-light); background: #fff; }
+  .modal input::placeholder { color: var(--text-muted); }
+  .modal .submit-btn { width: 100%; background: var(--purple); color: #fff; border: none; cursor: pointer; padding: 14px; border-radius: 8px; font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transition: background .2s; }
+  .modal .submit-btn:hover { background: var(--purple-mid); }
+  .modal-success { display: none; text-align: center; }
+  .modal-success.show { display: block; }
+  .modal-success .check { font-size: 3rem; margin-bottom: 16px; }
+  .modal-success h4 { font-family: 'Orbitron', monospace; font-size: 1.1rem; color: var(--text); margin-bottom: 10px; }
+  .modal-success p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* ══════════════════════════
+     BLOG POST MODAL
+  ══════════════════════════ */
+  .post-modal { max-width: 680px; max-height: 85vh; overflow-y: auto; }
+  .post-modal-thumb { width: 100%; height: 200px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; margin-bottom: 24px; }
+  .post-modal-cat { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--purple-mid); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .post-modal h3 { font-family: 'Orbitron', monospace; font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.3; }
+  .post-modal-content { color: var(--text-muted); font-size: 0.95rem; line-height: 1.75; }
+  .post-modal-content p { margin-bottom: 16px; }
+  .post-modal-content h4 { font-family: 'Orbitron', monospace; font-size: 0.88rem; color: var(--text); margin: 20px 0 8px; font-weight: 700; }
+
+  /* ══════════════════════════
+     RESPONSIVE
+  ══════════════════════════ */
+  @media(max-width:960px){ .footer-grid{grid-template-columns:1fr 1fr;} }
+  @media(max-width:640px){
+    .nav-links{display:none;}
+    .hamburger{display:flex;}
+    .footer-grid{grid-template-columns:1fr;}
+    .cta-banner{padding:50px 24px;}
+    .modal{padding:32px 24px;}
+    .why-section{padding:60px 5%;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="navbar">
+  <!-- SVG Logo matching Domara's angular/geometric font style -->
+  <svg class="logo-svg" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" aria-label="Domara">
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#4B0082"/>
+        <stop offset="100%" style="stop-color:#9b30d0"/>
+      </linearGradient>
+    </defs>
+    <!-- D -->
+    <path d="M2 4 L2 36 L14 36 Q26 36 26 20 Q26 4 14 4 Z M8 10 L13 10 Q19 10 19 20 Q19 30 13 30 L8 30 Z" fill="url(#logoGrad)"/>
+    <!-- O -->
+    <path d="M30 20 Q30 4 42 4 Q54 4 54 20 Q54 36 42 36 Q30 36 30 20 Z M36 20 Q36 30 42 30 Q48 30 48 20 Q48 10 42 10 Q36 10 36 20 Z" fill="url(#logoGrad)"/>
+    <!-- M -->
+    <path d="M58 36 L58 4 L66 4 L74 22 L82 4 L90 4 L90 36 L84 36 L84 15 L76 33 L72 33 L64 15 L64 36 Z" fill="url(#logoGrad)"/>
+    <!-- A -->
+    <path d="M94 36 L106 4 L114 4 L126 36 L119 36 L116 28 L104 28 L101 36 Z M106 22 L114 22 L110 10 Z" fill="url(#logoGrad)"/>
+    <!-- R -->
+    <path d="M130 4 L130 36 L136 36 L136 24 L141 24 L149 36 L156 36 L148 23 Q154 20 154 14 Q154 4 144 4 Z M136 10 L143 10 Q148 10 148 14 Q148 18 143 18 L136 18 Z" fill="url(#logoGrad)"/>
+    <!-- A -->
+    <path d="M160 36 L172 4 L180 4 L192 36 L185 36 L182 28 L170 28 L167 36 Z M172 22 L180 22 L176 10 Z" fill="url(#logoGrad)"/>
+  </svg>
+
+  <ul class="nav-links">
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#courses" class="nav-cta">Enroll Now</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#courses" onclick="toggleMenu()">Courses</a>
+  <a href="#why" onclick="toggleMenu()">Why Us</a>
+  <a href="#blog" onclick="toggleMenu()">Blog</a>
+  <a href="#testimonials" onclick="toggleMenu()">Reviews</a>
+  <a href="#courses" class="m-cta" onclick="toggleMenu()">Enroll Now →</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero" id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span> Now Enrolling — Cohort 2025
+    </div>
+
+    <!-- Large white version of logo for hero -->
+    <div style="display:flex;justify-content:center;margin-bottom:24px;">
+      <svg class="logo-svg-lg" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" aria-label="Domara">
+        <path d="M2 4 L2 36 L14 36 Q26 36 26 20 Q26 4 14 4 Z M8 10 L13 10 Q19 10 19 20 Q19 30 13 30 L8 30 Z" fill="#fff"/>
+        <path d="M30 20 Q30 4 42 4 Q54 4 54 20 Q54 36 42 36 Q30 36 30 20 Z M36 20 Q36 30 42 30 Q48 30 48 20 Q48 10 42 10 Q36 10 36 20 Z" fill="#fff"/>
+        <path d="M58 36 L58 4 L66 4 L74 22 L82 4 L90 4 L90 36 L84 36 L84 15 L76 33 L72 33 L64 15 L64 36 Z" fill="#fff"/>
+        <path d="M94 36 L106 4 L114 4 L126 36 L119 36 L116 28 L104 28 L101 36 Z M106 22 L114 22 L110 10 Z" fill="#fff"/>
+        <path d="M130 4 L130 36 L136 36 L136 24 L141 24 L149 36 L156 36 L148 23 Q154 20 154 14 Q154 4 144 4 Z M136 10 L143 10 Q148 10 148 14 Q148 18 143 18 L136 18 Z" fill="#fff"/>
+        <path d="M160 36 L172 4 L180 4 L192 36 L185 36 L182 28 L170 28 L167 36 Z M172 22 L180 22 L176 10 Z" fill="#fff"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-title">
+      Build the<br><span class="outline">Future</span><br>in Tech
+    </h1>
+    <p class="hero-sub">
+      Domara Tech Academy equips you with real-world skills in software engineering, data science, cybersecurity &amp; more — from zero to job-ready.
+    </p>
+    <div class="hero-actions">
+      <a href="#courses" class="btn-hero-primary">Explore Courses →</a>
+      <a href="#why" class="btn-hero-outline">How It Works</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats">
+  <div class="stat-item">
+    <span class="stat-num">5<span class="hi">K+</span></span>
+    <span class="stat-label">Graduates</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">92<span class="hi">%</span></span>
+    <span class="stat-label">Job Placement</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">18<span class="hi">+</span></span>
+    <span class="stat-label">Live Courses</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-num">150<span class="hi">+</span></span>
+    <span class="stat-label">Hiring Partners</span>
+  </div>
+</div>
+
+<!-- ══ COURSES ══ -->
+<section class="courses" id="courses">
+  <div class="courses-header">
+    <span class="section-tag">Programs</span>
+    <h2 class="section-title">Choose Your Path</h2>
+    <p class="section-desc">Industry-aligned courses designed by practitioners, not theorists. Learn by building real things.</p>
+  </div>
+  <div class="courses-grid">
+
+    <div class="course-card" onclick="openModal('Full-Stack Web Development')">
+      <div class="badge-new">Popular</div>
+      <div class="course-icon">💻</div>
+      <span class="course-level">Beginner → Advanced</span>
+      <div class="course-name">Full-Stack Web Development</div>
+      <p class="course-desc">HTML, CSS, JavaScript, React, Node.js &amp; databases. Build and deploy real products end-to-end.</p>
+      <div class="course-meta"><span>📅 6 Months</span><span>🎓 Certificate</span><span>🕐 Live + Async</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+    <div class="course-card" onclick="openModal('Data Science & AI')">
+      <div class="badge-new">Hot</div>
+      <div class="course-icon">🤖</div>
+      <span class="course-level">Intermediate</span>
+      <div class="course-name">Data Science &amp; AI</div>
+      <p class="course-desc">Python, machine learning, deep learning, and real-world AI model deployment with hands-on projects.</p>
+      <div class="course-meta"><span>📅 5 Months</span><span>🎓 Certificate</span><span>🕐 Live Classes</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+    <div class="course-card" onclick="openModal('Cybersecurity Engineering')">
+      <div class="course-icon">🛡️</div>
+      <span class="course-level">Beginner → Pro</span>
+      <div class="course-name">Cybersecurity Engineering</div>
+      <p class="course-desc">Ethical hacking, penetration testing, SOC operations, and network defence aligned with global certifications.</p>
+      <div class="course-meta"><span>📅 4 Months</span><span>🎓 Certificate</span><span>🕐 Live + Lab</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+    <div class="course-card" onclick="openModal('Cloud & DevOps Engineering')">
+      <div class="course-icon">☁️</div>
+      <span class="course-level">Intermediate</span>
+      <div class="course-name">Cloud &amp; DevOps Engineering</div>
+      <p class="course-desc">AWS, Azure, Docker, Kubernetes, CI/CD pipelines. Everything you need for a modern cloud career.</p>
+      <div class="course-meta"><span>📅 4 Months</span><span>🎓 Certificate</span><span>🕐 Live + Async</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+    <div class="course-card" onclick="openModal('UI/UX Design')">
+      <div class="course-icon">🎨</div>
+      <span class="course-level">Beginner</span>
+      <div class="course-name">UI/UX Design</div>
+      <p class="course-desc">User research, wireframing, Figma prototyping, and design systems that scale across products.</p>
+      <div class="course-meta"><span>📅 3 Months</span><span>🎓 Certificate</span><span>🕐 Async</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+    <div class="course-card" onclick="openModal('Mobile App Development')">
+      <div class="badge-new">New</div>
+      <div class="course-icon">📱</div>
+      <span class="course-level">Intermediate</span>
+      <div class="course-name">Mobile App Development</div>
+      <p class="course-desc">React Native &amp; Flutter for iOS and Android. From concept to App Store in one cohort.</p>
+      <div class="course-meta"><span>📅 5 Months</span><span>🎓 Certificate</span><span>🕐 Live Classes</span></div>
+      <button class="course-btn">Enroll Now →</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ WHY DOMARA ══ -->
+<section class="why-section" id="why">
+  <div class="why-wrap">
+    <div class="why-visual-box">
+      <div class="code-block">
+        <div><span class="cm">// domara.academy</span></div>
+        <div><span class="kw">const</span> you = {</div>
+        <div>&nbsp;&nbsp;skills: <span class="str">[]</span>,</div>
+        <div>&nbsp;&nbsp;goal: <span class="str">"tech career"</span>,</div>
+        <div>&nbsp;&nbsp;ready: <span class="kw">true</span></div>
+        <div>};</div>
+        <br>
+        <div><span class="fn">Domara</span>.<span class="fn">enroll</span>(you)</div>
+        <div>&nbsp;&nbsp;.<span class="fn">then</span>(grad =></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">getHired</span>(grad))</div>
+        <div>&nbsp;&nbsp;.<span class="fn">catch</span>(() =></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// we don't do that here</span></div>
+        <div>&nbsp;&nbsp;);<span class="cursor"></span></div>
+      </div>
+      <div class="corner-tag">v2025.1.0</div>
+    </div>
+
+    <div>
+      <span class="section-tag">Why Domara</span>
+      <h2 class="section-title">We Don't Just Teach.<br>We Transform.</h2>
+      <p class="section-desc">Every program is built around one goal: getting you hired and thriving in the tech industry.</p>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-text">
+            <h4>Project-Based Learning</h4>
+            <p>Graduate with a real portfolio — not just a certificate. Build things employers actually care about.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">👨‍💻</div>
+          <div class="feature-text">
+            <h4>Expert Mentors</h4>
+            <p>Learn from senior engineers actively working in leading tech companies worldwide.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🤝</div>
+          <div class="feature-text">
+            <h4>Career Support</h4>
+            <p>CV review, mock interviews, referrals, and access to our network of 150+ hiring partners.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🌍</div>
+          <div class="feature-text">
+            <h4>Flexible &amp; Global</h4>
+            <p>Study live or async from anywhere. Programs built for busy people in any timezone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BLOG ══ -->
+<section class="blog-section" id="blog">
+  <div class="blog-header">
+    <span class="section-tag">Insights</span>
+    <h2 class="section-title">From the Domara Blog</h2>
+    <p class="section-desc">Tips, tutorials, and career advice from our instructors and alumni in the tech industry.</p>
+  </div>
+  <div class="blog-grid">
+
+    <div class="blog-card" onclick="openPost(0)">
+      <div class="blog-thumb blog-thumb-1">
+        <span class="blog-thumb-label">Featured</span>
+        🚀
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">Web Dev</span>
+          <span class="blog-date">Apr 18, 2025</span>
+        </div>
+        <div class="blog-title">10 JavaScript Concepts Every Junior Developer Must Know in 2025</div>
+        <p class="blog-excerpt">From closures to async/await, here are the concepts that interviewers are consistently testing — and how to master them.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">KA</div>
+          <div>
+            <div class="blog-author-name">Kofi Asante</div>
+            <span class="blog-read-time">8 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card" onclick="openPost(1)">
+      <div class="blog-thumb blog-thumb-2">
+        <span class="blog-thumb-label">Career</span>
+        💼
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">Career</span>
+          <span class="blog-date">Apr 10, 2025</span>
+        </div>
+        <div class="blog-title">How to Land Your First Tech Job With No Experience</div>
+        <p class="blog-excerpt">A step-by-step guide on building the right portfolio, networking effectively, and standing out in a crowded job market.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">FA</div>
+          <div>
+            <div class="blog-author-name">Fatima Al-Rashid</div>
+            <span class="blog-read-time">6 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card" onclick="openPost(2)">
+      <div class="blog-thumb blog-thumb-3">
+        <span class="blog-thumb-label">AI</span>
+        🤖
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">AI &amp; Data</span>
+          <span class="blog-date">Apr 2, 2025</span>
+        </div>
+        <div class="blog-title">The Rise of AI Engineers: What the Role Actually Looks Like</div>
+        <p class="blog-excerpt">AI engineering is one of the fastest-growing roles in tech. Here's what the day-to-day looks like and how to get there.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">OM</div>
+          <div>
+            <div class="blog-author-name">Obinna Madu</div>
+            <span class="blog-read-time">7 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card" onclick="openPost(3)">
+      <div class="blog-thumb blog-thumb-4">
+        <span class="blog-thumb-label">Cloud</span>
+        ☁️
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">Cloud</span>
+          <span class="blog-date">Mar 25, 2025</span>
+        </div>
+        <div class="blog-title">AWS vs Azure vs GCP: Which Cloud Should You Learn First?</div>
+        <p class="blog-excerpt">We break down the three major cloud platforms, their market share, salary differences, and which one gives you the fastest ROI.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">LN</div>
+          <div>
+            <div class="blog-author-name">Lena Nwosu</div>
+            <span class="blog-read-time">9 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card" onclick="openPost(4)">
+      <div class="blog-thumb blog-thumb-5">
+        <span class="blog-thumb-label">Security</span>
+        🛡️
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">Cybersecurity</span>
+          <span class="blog-date">Mar 15, 2025</span>
+        </div>
+        <div class="blog-title">5 Cybersecurity Certifications That Will Get You Hired Fast</div>
+        <p class="blog-excerpt">CompTIA, CEH, CISSP — we rank the most impactful certs by employability, salary impact, and time to complete.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">SB</div>
+          <div>
+            <div class="blog-author-name">Samuel Boateng</div>
+            <span class="blog-read-time">5 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="blog-card" onclick="openPost(5)">
+      <div class="blog-thumb blog-thumb-6">
+        <span class="blog-thumb-label">Design</span>
+        🎨
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">
+          <span class="blog-cat">UI/UX</span>
+          <span class="blog-date">Mar 5, 2025</span>
+        </div>
+        <div class="blog-title">Why Every Developer Should Learn Basic UI/UX in 2025</div>
+        <p class="blog-excerpt">Developers who understand design principles ship better products, earn more, and get promoted faster. Here's where to start.</p>
+        <button class="blog-read">Read Article →</button>
+        <div class="blog-author">
+          <div class="blog-avatar">AI</div>
+          <div>
+            <div class="blog-author-name">Amara Ibrahim</div>
+            <span class="blog-read-time">6 min read</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="blog-cta-wrap">
+    <a href="#" class="btn-outline-purple">View All Articles →</a>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+<section class="testimonials" id="testimonials">
+  <div class="testimonials-header">
+    <span class="section-tag">Reviews</span>
+    <h2 class="section-title">From Our Graduates</h2>
+    <p class="section-desc">Real stories from people who made the leap into tech with Domara.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Before Domara I had zero coding experience. Six months later I landed a junior developer role. The mentorship was unlike anything I expected."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">AA</div>
+        <div><div class="tname">Amina Abdullahi</div><div class="trole">Junior Developer @ TechBridge</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"The Data Science course is incredibly thorough. The real-world projects in my portfolio gave me an edge in every interview I had."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">KO</div>
+        <div><div class="tname">Kwame Ofori</div><div class="trole">Data Analyst @ FinEdge</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-text">"Domara's cybersecurity program is world-class. I passed my CEH exam on the first attempt and got hired 3 weeks after graduating."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">ZB</div>
+        <div><div class="tname">Zara Bakr</div><div class="trole">Security Analyst @ SecureNet</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<div class="cta-wrap">
+  <div class="cta-banner">
+    <h2>Your Tech Career Starts Today</h2>
+    <p>Join thousands of Domara graduates building the future. Applications open — limited seats per cohort.</p>
+    <a href="#courses" class="btn-white">Apply Now →</a>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <!-- White logo for dark footer -->
+      <svg class="logo-svg" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" aria-label="Domara">
+        <path d="M2 4 L2 36 L14 36 Q26 36 26 20 Q26 4 14 4 Z M8 10 L13 10 Q19 10 19 20 Q19 30 13 30 L8 30 Z" fill="#fff"/>
+        <path d="M30 20 Q30 4 42 4 Q54 4 54 20 Q54 36 42 36 Q30 36 30 20 Z M36 20 Q36 30 42 30 Q48 30 48 20 Q48 10 42 10 Q36 10 36 20 Z" fill="#fff"/>
+        <path d="M58 36 L58 4 L66 4 L74 22 L82 4 L90 4 L90 36 L84 36 L84 15 L76 33 L72 33 L64 15 L64 36 Z" fill="#fff"/>
+        <path d="M94 36 L106 4 L114 4 L126 36 L119 36 L116 28 L104 28 L101 36 Z M106 22 L114 22 L110 10 Z" fill="#fff"/>
+        <path d="M130 4 L130 36 L136 36 L136 24 L141 24 L149 36 L156 36 L148 23 Q154 20 154 14 Q154 4 144 4 Z M136 10 L143 10 Q148 10 148 14 Q148 18 143 18 L136 18 Z" fill="#fff"/>
+        <path d="M160 36 L172 4 L180 4 L192 36 L185 36 L182 28 L170 28 L167 36 Z M172 22 L180 22 L176 10 Z" fill="#fff"/>
+      </svg>
+      <p>Domara Tech Academy is committed to building the next generation of world-class technology professionals.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn">in</a>
+        <a href="#" class="social-btn">tw</a>
+        <a href="#" class="social-btn">ig</a>
+        <a href="#" class="social-btn">yt</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Programs</h5>
+      <ul>
+        <li><a href="#courses">Full-Stack Dev</a></li>
+        <li><a href="#courses">Data Science &amp; AI</a></li>
+        <li><a href="#courses">Cybersecurity</a></li>
+        <li><a href="#courses">Cloud &amp; DevOps</a></li>
+        <li><a href="#courses">UI/UX Design</a></li>
+        <li><a href="#courses">Mobile Dev</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Academy</h5>
+      <ul>
+        <li><a href="#why">About Us</a></li>
+        <li><a href="#why">Our Mentors</a></li>
+        <li><a href="#testimonials">Success Stories</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#">Hiring Partners</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Scholarships</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Domara Tech Academy. All rights reserved.</p>
+    <p>Built with <span style="color:var(--purple-light)">♥</span> for the next generation</p>
+  </div>
+</footer>
+
+<!-- ══ ENROLL MODAL ══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalForm">
+      <h3>Enroll Now</h3>
+      <span class="modal-course-name" id="modalCourseName"></span>
+      <label>Full Name</label>
+      <input type="text" placeholder="e.g. Amina Abdullahi" id="enrollName">
+      <label>Email Address</label>
+      <input type="email" placeholder="you@example.com" id="enrollEmail">
+      <label>Phone Number</label>
+      <input type="tel" placeholder="+1 000 000 0000" id="enrollPhone">
+      <button class="submit-btn" onclick="submitEnroll()">Submit Application →</button>
+    </div>
+    <div class="modal-success" id="modalSuccess">
+      <div class="check">✅</div>
+      <h4>Application Received!</h4>
+      <p>Thanks for applying to <strong id="successCourse" style="color:var(--purple-mid)"></strong>.<br>Our team will reach out within 24 hours.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BLOG POST MODAL ══ -->
+<div class="modal-overlay" id="postOverlay" onclick="handlePostOverlayClick(event)">
+  <div class="modal post-modal">
+    <button class="modal-close" onclick="closePost()">✕</button>
+    <div id="postContent"></div>
+  </div>
+</div>
+
+<script>
+  // ── NAV scroll behaviour ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── Mobile menu ──
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // ── Enroll modal ──
+  function openModal(course) {
+    document.getElementById('modalCourseName').textContent = '// ' + course;
+    document.getElementById('successCourse').textContent = course;
+    document.getElementById('modalForm').style.display = 'block';
+    document.getElementById('modalSuccess').classList.remove('show');
+    ['enrollName','enrollEmail','enrollPhone'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+  function submitEnroll() {
+    const name = document.getElementById('enrollName').value.trim();
+    const email = document.getElementById('enrollEmail').value.trim();
+    if (!name || !email) { alert('Please fill in your name and email.'); return; }
+    document.getElementById('modalForm').style.display = 'none';
+    document.getElementById('modalSuccess').classList.add('show');
+  }
+
+  // ── Blog posts data ──
+  const posts = [
+    {
+      thumb: 'blog-thumb-1', emoji: '🚀', cat: 'Web Dev',
+      title: '10 JavaScript Concepts Every Junior Developer Must Know in 2025',
+      content: `<p>JavaScript continues to evolve, and with it, the bar for what employers expect from junior developers. Whether you're just starting out or brushing up before your next interview, mastering these ten concepts will give you a serious edge.</p>
+      <h4>1. Closures</h4><p>A closure gives you access to an outer function's scope from an inner function. Understanding closures is essential for working with callbacks, event listeners, and module patterns.</p>
+      <h4>2. Async / Await</h4><p>Modern JavaScript is heavily asynchronous. Async/await makes promise-based code cleaner and more readable — and interviewers love asking about it.</p>
+      <h4>3. The Event Loop</h4><p>Understanding how JavaScript handles concurrency under the hood separates junior developers from senior ones. Know your call stack, task queue, and microtask queue.</p>
+      <h4>4. Destructuring & Spread</h4><p>These ES6+ features are everywhere in modern codebases. Clean, concise, and expected in any professional setting.</p>
+      <h4>5. Prototypal Inheritance</h4><p>Even with classes, JavaScript is prototype-based. Knowing how the prototype chain works will help you debug and write better code.</p>
+      <p>Master these and you're already ahead of most candidates. At Domara, our Full-Stack program covers every one of these in depth — with real project applications.</p>`
+    },
+    {
+      thumb: 'blog-thumb-2', emoji: '💼', cat: 'Career',
+      title: 'How to Land Your First Tech Job With No Experience',
+      content: `<p>Breaking into tech without prior experience can feel daunting — but thousands of Domara graduates have done it. Here's the exact playbook that works.</p>
+      <h4>Step 1: Build a Portfolio, Not Just Projects</h4><p>Anyone can build a to-do app. The candidates who stand out deploy real projects, write clean READMEs, and can speak confidently about their architectural decisions.</p>
+      <h4>Step 2: Get Active on GitHub</h4><p>Your green squares tell a story. Contribute to open-source, document your work, and show consistent activity. Recruiters look at this.</p>
+      <h4>Step 3: Network Deliberately</h4><p>80% of jobs are never posted publicly. Attend meetups, connect with alumni, and send thoughtful LinkedIn messages. One warm introduction beats 50 cold applications.</p>
+      <h4>Step 4: Target the Right Companies</h4><p>Startups and scale-ups often care more about what you can do than where you've been. Look for companies that mention mentorship and growth in their job posts.</p>
+      <p>Domara's Career Support program gives you CV reviews, mock interviews, and direct referrals to our 150+ hiring partners. That's your unfair advantage.</p>`
+    },
+    {
+      thumb: 'blog-thumb-3', emoji: '🤖', cat: 'AI & Data',
+      title: 'The Rise of AI Engineers: What the Role Actually Looks Like',
+      content: `<p>AI Engineer is the hottest title in tech right now — but what does the job actually involve day-to-day? We asked three working AI engineers to share their experiences.</p>
+      <h4>It's More Engineering Than Science</h4><p>Many people assume AI engineers spend their days training models. In reality, most of the work involves building the infrastructure that serves models: APIs, pipelines, monitoring, and deployment systems.</p>
+      <h4>The Core Skill Set</h4><p>Python is essential. So is familiarity with LLM APIs (OpenAI, Anthropic, etc.), vector databases, and orchestration frameworks like LangChain. Solid software engineering fundamentals are non-negotiable.</p>
+      <h4>Prompting Is a Real Skill</h4><p>Prompt engineering has evolved from a curiosity to a discipline. The best AI engineers know how to design prompts, evaluate outputs, and build feedback loops into their systems.</p>
+      <h4>The Salary Reality</h4><p>Entry-level AI engineers are commanding salaries 20–40% above traditional software roles. Senior AI engineers at top companies are among the highest-paid professionals in tech.</p>
+      <p>Domara's Data Science & AI program is specifically designed to prepare you for this role — not just the theory, but the engineering that companies actually hire for.</p>`
+    },
+    {
+      thumb: 'blog-thumb-4', emoji: '☁️', cat: 'Cloud',
+      title: 'AWS vs Azure vs GCP: Which Cloud Should You Learn First?',
+      content: `<p>If you're entering cloud computing, choosing where to focus your energy matters. Here's our honest breakdown.</p>
+      <h4>AWS: The Market Leader</h4><p>AWS holds about 31% of the cloud market and has the deepest job market. If you want maximum job opportunities, AWS is the safe bet. Start with Solutions Architect Associate.</p>
+      <h4>Azure: The Enterprise Choice</h4><p>Microsoft Azure dominates enterprise and government sectors. If you want to work in banking, healthcare, or large corporates, Azure skills are in high demand and often command a premium.</p>
+      <h4>GCP: The Data & AI Platform</h4><p>Google Cloud is strongest in data engineering and AI/ML workloads. If you're combining cloud with data science, GCP's BigQuery and Vertex AI are industry-leading tools.</p>
+      <h4>Our Recommendation</h4><p>Start with AWS for breadth and job security. Add Azure if you're targeting enterprise clients. Layer in GCP if your focus is data. Domara's Cloud & DevOps program covers all three with a practical project focus.</p>`
+    },
+    {
+      thumb: 'blog-thumb-5', emoji: '🛡️', cat: 'Cybersecurity',
+      title: '5 Cybersecurity Certifications That Will Get You Hired Fast',
+      content: `<p>Not all cybersecurity certifications are created equal. Here are the five that consistently open doors and command higher salaries.</p>
+      <h4>1. CompTIA Security+</h4><p>The entry-level standard. Required by many government and defence contractors. Take this first — it validates core security concepts and is widely recognised globally.</p>
+      <h4>2. Certified Ethical Hacker (CEH)</h4><p>Taught in Domara's Cybersecurity program, CEH proves you understand offensive security. It's highly valued in penetration testing and red team roles.</p>
+      <h4>3. CompTIA CySA+</h4><p>The analyst's cert. Focused on threat detection, monitoring, and response. Perfect for SOC analyst roles, which are consistently one of the most in-demand positions.</p>
+      <h4>4. CISSP</h4><p>The gold standard for senior security professionals. Requires 5 years of experience but commands some of the highest salaries in the industry — often $120K+.</p>
+      <h4>5. Google Cybersecurity Certificate</h4><p>A newer but fast-rising credential. Backed by Google's hiring network, it's an excellent entry point and pairs well with Security+.</p>
+      <p>Domara prepares you for CEH and Security+ as part of the Cybersecurity Engineering program — with full exam prep included.</p>`
+    },
+    {
+      thumb: 'blog-thumb-6', emoji: '🎨', cat: 'UI/UX',
+      title: 'Why Every Developer Should Learn Basic UI/UX in 2025',
+      content: `<p>The divide between "developer" and "designer" is narrowing fast. Here's why picking up UI/UX fundamentals is one of the best career investments you can make.</p>
+      <h4>You'll Ship Better Products</h4><p>Developers who understand user flows, hierarchy, and accessibility build things people actually enjoy using. That matters to every company — and it shows up in your code reviews.</p>
+      <h4>You'll Be More Valuable in Small Teams</h4><p>At startups and scale-ups, wearing multiple hats is expected. A developer who can also prototype in Figma and speak intelligently to design decisions is genuinely rare.</p>
+      <h4>It Makes You a Better Communicator</h4><p>Understanding design language helps you work more effectively with designers and product managers. Fewer misunderstandings, faster delivery.</p>
+      <h4>Where to Start</h4><p>Start with the four fundamentals: contrast, alignment, repetition, and proximity. Then learn Figma basics. A week of intentional practice will change how you see every interface you interact with.</p>
+      <p>Domara's UI/UX Design program goes from zero to Figma-fluent in three months. Perfect as a standalone course or a complement to any development track.</p>`
+    }
+  ];
+
+  function openPost(idx) {
+    const p = posts[idx];
+    document.getElementById('postContent').innerHTML = `
+      <div class="post-modal-thumb ${p.thumb}">${p.emoji}</div>
+      <span class="post-modal-cat">${p.cat}</span>
+      <h3>${p.title}</h3>
+      <div class="post-modal-content">${p.content}</div>
+    `;
+    document.getElementById('postOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePost() {
+    document.getElementById('postOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function handlePostOverlayClick(e) {
+    if (e.target === document.getElementById('postOverlay')) closePost();
+  }
+
+  // ── Scroll fade-in ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.course-card, .testi-card, .feature-item, .stat-item, .blog-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity .55s ease, transform .55s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
